@@ -1855,6 +1855,14 @@ factory pattern to create these objects.</p>
       ]]>
     </Details>
   </Detector>
+  <Detector class="edu.umd.cs.findbugs.detect.UnsafeDeserialization">
+    <Details>
+      <![CDATA[
+            <p>Checks for ... .
+            </p>
+      ]]>
+    </Details>
+  </Detector>
   <!--
   **********************************************************************
   BugPatterns
@@ -9333,6 +9341,28 @@ Using floating-point variables should not be used as loop counters, as they are 
       </p>]]>
     </Details>
   </BugPattern>
+  <BugPattern type="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES">
+    <ShortDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.</ShortDescription>
+    <LongDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.
+      An attacker can tamper with the serialized form of such a class, appending extra references to the byte stream.
+      When deserialized, this byte stream could allow the creation of a class instance whose internal variable references are controlled by the attacker.
+      Consequently, the class instance can mutate and violate its class invariants.
+      This rule is an instance of OBJ06-J. Defensively copy mutable inputs and mutable internal components, which applies to constructors and to other methods that accept untrusted mutable arguments.
+      This rule applies the same principle to deserialized mutable fields.</LongDescription>
+    <Details>
+      <![CDATA[
+        <p>There is no need to copy immutable subobjects.
+        Also, avoid using the subobject's clone() method because it can be overridden when the subobject's class is not final and produces only a shallow copy.
+        The references to the subobjects themselves must be nonfinal so that defensive copying can occur.
+        It is also inadvisable to use the writeUnshared() and readUnshared() methods as an alternative</p>
+
+        <p>
+        See SEI CERT rule <a href="https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization">SER06-J. Make defensive copies of private mutable components during deserialization</a>
+        for more information.
+        </p>
+        ]]>
+    </Details>
+  </BugPattern>
   <!--
   **********************************************************************
    BugCodes
@@ -9494,5 +9524,6 @@ Using floating-point variables should not be used as loop counters, as they are 
   <BugCode abbrev="AA">Misuse of assertions for checking arguments of public methods</BugCode>
   <BugCode abbrev="PI">Do not reuse public identifiers from Java Standard Library</BugCode>
   <BugCode abbrev="ENV">Environment variable is used instead of the corresponding Java property</BugCode>
+  <BugCode abbrev="UD">Unsafe Deserialization</BugCode>
 </MessageCollection>
 
