@@ -8,22 +8,16 @@ import java.util.Map;
 
 public class BadUnsafeDeserializationHashMap implements Serializable {
 
-    private static final Map<Object, Object> epoch = new HashMap<>();
+    private static final Map<Object, Object> immutable = new HashMap<>();
 
-    private Map<Object, Object> date; // Mutable component
+    private Map<Object, Object> mutable; // Mutable component
 
     public BadUnsafeDeserializationHashMap(Map<String, Integer> map) {
-        date = new HashMap<>(map);
+        mutable = new HashMap<>(map);
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ois.defaultReadObject();
     }
 
-    /*
-    public Map<String, Integer> getMutableMap() {
-        // Getter to access the mutable map
-        return new HashMap<>(mutableMap); // Return a defensive copy
-    }
-    */
 }

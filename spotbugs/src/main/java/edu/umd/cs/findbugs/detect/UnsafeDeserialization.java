@@ -39,92 +39,99 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
 
     private final BugReporter bugReporter;
 
-    private boolean isSerializable;
-
-    private final Set<XField> interestingFields = new HashSet<>();
+    private final Set<XField> mutableFields = new HashSet<>();
 
     public UnsafeDeserialization(BugReporter bugReporter) {
         this.bugReporter = bugReporter;
     }
+    
+    private Method isReadObjectFoundAndGet(JavaClass obj) {
+        Optional<Method> readObjMethod = Arrays.stream(obj.getMethods())
+                .filter(i -> i.getName().equals("readObject")
+                        && "(Ljava/io/ObjectInputStream;)V".equals(i.getSignature())
+                        && i.isPrivate())
+                .findFirst();
+        
+        return readObjMethod.orElse(null);
+    }
+    
+    private boolean isReadObjectFound() {
+        return isReadObjectFoundAndGet(getClassContext().getJavaClass()) != null;
+    }
+    
+    private boolean isSerializable() {
+        return Subtypes2.instanceOf(getClassContext().getJavaClass(), "java.io.Serializable");
+    }
 
     @Override
     public void visitClassContext(ClassContext classContext) {
-        if (Subtypes2.instanceOf(classContext.getJavaClass(), "java.io.Serializable")) {
-            isSerializable = true;
-            super.visitClassContext(classContext);
-        }
+        super.visitClassContext(classContext);
     }
 
     @Override
     public void visit(Field obj) {
-        if (isSerializable) {
+        if (isSerializable()) {
             XField xField = getXField();
-            if (!xField.isStatic() && (xField.isPrivate() || xField.isFinal()) && xField.isReferenceType()) {
-                // transient field check
-                // collections
-                interestingFields.add(xField);
+            if (!xField.isStatic()
+                    && (xField.isPrivate() || xField.isFinal())
+                    && xField.isReferenceType()
+                    && !obj.isTransient()
+                    && !xField.isVolatile()
+                    && !xField.isSynthetic()
+                    && !xField.isEnum()) {
+                mutableFields.add(xField);
             }
         }
     }
 
     @Override
     public void visitAfter(JavaClass obj) {
-        Optional<Method> readObjMethod = Arrays.stream(obj.getMethods())
-                .filter(i -> i.getName().equals("readObject")
-                        && "(Ljava/io/ObjectInputStream;)V".equals(i.getSignature())
-                        && i.isPrivate())
-                .findFirst();
-
-        if (!interestingFields.isEmpty() && readObjMethod.isPresent()) {
-            String allFields = interestingFields.stream()
+        if (!mutableFields.isEmpty() && isReadObjectFoundAndGet(obj) != null) {
+            String allFields = mutableFields.stream()
                     .map(XField::getName)
                     .sorted()
                     .collect(Collectors.joining(","));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
-                    .addClass(getClassContext().getJavaClass())
+                    .addClass(obj)
                     .addString(allFields)
-                    .addMethod(obj, readObjMethod.get()));
+                    .addMethod(obj, isReadObjectFoundAndGet(obj)));
         }
-
     }
 
     @Override
     public void sawOpcode(int seen) {
-        if ("readObject".equals(getMethodName()) && "(Ljava/io/ObjectInputStream;)V".equals(getMethodSig()) && isSerializable && getMethod()
-                .isPrivate()) {
+        if (isSerializable() && isReadObjectFound()) {
+            // There are two ways to make a defensive copy:
+            // 1. Assignment: PUTFILED, PUTSTATIC
+            // 2. Method call: INVOKESTATIC, INVOKEVIRTUAL, INVOKESPECIAL, INVOKEINTERFACE
             if (seen == Const.PUTFIELD || seen == Const.PUTSTATIC) {
                 XField field = getXFieldOperand();
-                if (interestingFields.contains(field)) {
-                    interestingFields.remove(field);
-                }
+	            mutableFields.remove(field);
             } else if (seen == Const.INVOKESTATIC || seen == Const.INVOKEVIRTUAL
                     || seen == Const.INVOKESPECIAL || seen == Const.INVOKEINTERFACE) {
                 String methodName = getNameConstantOperand();
                 // Collections.copy()
                 int stackDepth = stack.getStackDepth();
+                int stackItemForCopy = 1; // Collections.copy(dest, src) has 2 arguments, we need src
                 if ("copy".equals(methodName) && "java/util/Collections".equals(getClassConstantOperand())
-                        && stackDepth >= 2) { // check method before the stack
-                    XField field = stack.getStackItem(1).getXField();
-                    if (interestingFields.contains(stack.getStackItem(1).getXField())) {
-                        interestingFields.remove(field);
+                        && stackDepth > stackItemForCopy) { // check method before the stack
+                    XField field = stack.getStackItem(stackItemForCopy).getXField();
+                    if (mutableFields.contains(stack.getStackItem(stackItemForCopy).getXField())) {
+                        mutableFields.remove(field);
                     }
                 }
                 // System.arraycopy()
                 if ("arraycopy".equals(methodName) && "java/lang/System".equals(getClassConstantOperand())
                         && stackDepth >= 3) {
                     XField field = stack.getStackItem(2).getXField();
-                    interestingFields.remove(field);
+                    mutableFields.remove(field);
                 }
             }
         }
     }
-
+    
     @Override
-    public void afterOpcode(int seen) {
-        super.afterOpcode(seen);
-
-        if (seen == Const.INVOKESTATIC) {
-            // todo
-        }
+    public void report() {
+        mutableFields.clear();
     }
 }
