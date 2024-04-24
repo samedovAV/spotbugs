@@ -18,7 +18,7 @@ public class GoodUnsafeDeserializationFactory implements Serializable {
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
         ObjectInputStream.GetField fields = ois.readFields();
         FactoryInterface inDate = (FactoryInterface) fields.get("date", epoch);
-        date = classFactory.createNewInstance(inDate);
+        date = ClassFactory.createNewInstance(inDate);
     }
 
 }

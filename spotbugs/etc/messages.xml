@@ -1858,7 +1858,7 @@ factory pattern to create these objects.</p>
   <Detector class="edu.umd.cs.findbugs.detect.UnsafeDeserialization">
     <Details>
       <![CDATA[
-            <p>Checks for ... .
+            <p>Checks for defensive copies of mutable fields in class which perform deserializaion.
             </p>
       ]]>
     </Details>
@@ -9343,12 +9343,7 @@ Using floating-point variables should not be used as loop counters, as they are 
   </BugPattern>
   <BugPattern type="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES">
     <ShortDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.</ShortDescription>
-    <LongDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.
-      An attacker can tamper with the serialized form of such a class, appending extra references to the byte stream.
-      When deserialized, this byte stream could allow the creation of a class instance whose internal variable references are controlled by the attacker.
-      Consequently, the class instance can mutate and violate its class invariants.
-      This rule is an instance of OBJ06-J. Defensively copy mutable inputs and mutable internal components, which applies to constructors and to other methods that accept untrusted mutable arguments.
-      This rule applies the same principle to deserialized mutable fields.</LongDescription>
+    <LongDescription>Every serializable class that has private mutable instance variables must defensively copy them in the '{3}' method.</LongDescription>
     <Details>
       <![CDATA[
         <p>There is no need to copy immutable subobjects.

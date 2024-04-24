@@ -15,6 +15,8 @@ public abstract class ClassFactory {
     }
 
     public abstract FactoryInterface createFactoryInstance();
-
-    public abstract FactoryInterface createNewInstance(FactoryInterface factoryInterface);
+	
+	public static FactoryInterface createNewInstance(FactoryInterface factoryInterface) {
+		return null;
+	}
 }

@@ -6,14 +6,15 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 
-public class GoodUnsafeDeserializationImmutableListCopyOf<T> implements Serializable {
+public class GoodUnsafeDeserializationImmutableListCopyOf implements Serializable {
 
-    private ImmutableList<T> epoch = new ImmutableList.Builder<T>().build();
+    private ImmutableList<Object> immutable = new ImmutableList.Builder<Object>().build();
 
-    private List<T> date = null;
+    private List<Object> mutable = null;
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-        epoch = (ImmutableList<T>) ois.readObject();
-        date = ImmutableList.copyOf(epoch);
+        ObjectInputStream.GetField fields = ois.readFields();
+        List<Object> inDate = (List<Object>) fields.get("mutable", immutable);
+        mutable = ImmutableList.copyOf(inDate);
     }
 }

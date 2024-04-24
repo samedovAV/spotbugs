@@ -690,8 +690,7 @@
                     reports="ENV_USE_PROPERTY_INSTEAD_OF_ENV"/>
           <Detector class="edu.umd.cs.findbugs.detect.MultipleInstantiationsOfSingletons" speed="fast"
                     reports="SING_SINGLETON_IMPLEMENTS_CLONEABLE,SING_SINGLETON_INDIRECTLY_IMPLEMENTS_CLONEABLE,SING_SINGLETON_IMPLEMENTS_CLONE_METHOD,SING_SINGLETON_HAS_NONPRIVATE_CONSTRUCTOR,SING_SINGLETON_IMPLEMENTS_SERIALIZABLE,SING_SINGLETON_GETTER_NOT_SYNCHRONIZED" />
-          <Detector class="edu.umd.cs.findbugs.detect.UnsafeDeserialization"
-                    speed="fast"
+          <Detector class="edu.umd.cs.findbugs.detect.UnsafeDeserialization" speed="fast"
                     reports="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES"/>
     <!-- Bug Categories -->
           <BugCategory category="NOISE" hidden="true"/>
