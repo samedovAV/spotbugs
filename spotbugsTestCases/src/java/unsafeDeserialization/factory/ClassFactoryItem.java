@@ -7,8 +7,7 @@ public class ClassFactoryItem extends ClassFactory {
         return new FactoryInterfaceImplementation();
     }
 
-    @Override
-    public FactoryInterface createNewInstance(FactoryInterface factoryInterface) {
+    public static FactoryInterface createNewInstance(FactoryInterface factoryInterface) {
         return new FactoryInterfaceImplementation(factoryInterface);
     }
 }
