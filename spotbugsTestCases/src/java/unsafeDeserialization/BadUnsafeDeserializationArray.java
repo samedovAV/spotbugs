@@ -6,12 +6,12 @@ import java.io.Serializable;
 
 public class BadUnsafeDeserializationArray implements Serializable {
 
-    private static final int[] epoch = new int[0];
+    private static final int[] immutable = new int[0];
 
-    private int[] date = null; // Mutable component
+    private int[] mutable = null;
 
     public BadUnsafeDeserializationArray(int[] arr) {
-        date = arr;
+        mutable = arr;
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

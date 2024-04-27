@@ -20,22 +20,24 @@ package edu.umd.cs.findbugs.detect;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugReporter;
-import edu.umd.cs.findbugs.ba.ClassContext;
 import edu.umd.cs.findbugs.ba.XField;
 import edu.umd.cs.findbugs.ba.ch.Subtypes2;
 import edu.umd.cs.findbugs.bcel.OpcodeStackDetector;
+import org.apache.bcel.Const;
+import org.apache.bcel.classfile.Field;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.Method;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.bcel.Const;
-import org.apache.bcel.classfile.Field;
-import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
-
 public class UnsafeDeserialization extends OpcodeStackDetector {
+
+    // Collections.copy(dest, src) has 2 arguments, we need src
+    public static final int STACK_ITEM_FOR_COPY = 1;
 
     private final BugReporter bugReporter;
 
@@ -44,28 +46,25 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public UnsafeDeserialization(BugReporter bugReporter) {
         this.bugReporter = bugReporter;
     }
-    
+
     private Method isReadObjectFoundAndGet(JavaClass obj) {
         Optional<Method> readObjMethod = Arrays.stream(obj.getMethods())
                 .filter(i -> i.getName().equals("readObject")
                         && "(Ljava/io/ObjectInputStream;)V".equals(i.getSignature())
                         && i.isPrivate())
                 .findFirst();
-        
+
         return readObjMethod.orElse(null);
     }
-    
+
     private boolean isReadObjectFound() {
-        return isReadObjectFoundAndGet(getClassContext().getJavaClass()) != null;
-    }
-    
-    private boolean isSerializable() {
-        return Subtypes2.instanceOf(getClassContext().getJavaClass(), "java.io.Serializable");
+        return "readObject".equals(getMethodName())
+                && "(Ljava/io/ObjectInputStream;)V".equals(getMethodSig())
+                && getMethod().isPrivate();
     }
 
-    @Override
-    public void visitClassContext(ClassContext classContext) {
-        super.visitClassContext(classContext);
+    private boolean isSerializable() {
+        return Subtypes2.instanceOf(getClassContext().getJavaClass(), "java.io.Serializable");
     }
 
     @Override
@@ -90,7 +89,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
             String allFields = mutableFields.stream()
                     .map(XField::getName)
                     .sorted()
-                    .collect(Collectors.joining(","));
+                    .collect(Collectors.joining(", "));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
                     .addClass(obj)
                     .addString(allFields)
@@ -106,17 +105,16 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
             // 2. Method call: INVOKESTATIC, INVOKEVIRTUAL, INVOKESPECIAL, INVOKEINTERFACE
             if (seen == Const.PUTFIELD || seen == Const.PUTSTATIC) {
                 XField field = getXFieldOperand();
-	            mutableFields.remove(field);
+                mutableFields.remove(field);
             } else if (seen == Const.INVOKESTATIC || seen == Const.INVOKEVIRTUAL
                     || seen == Const.INVOKESPECIAL || seen == Const.INVOKEINTERFACE) {
                 String methodName = getNameConstantOperand();
                 // Collections.copy()
                 int stackDepth = stack.getStackDepth();
-                int stackItemForCopy = 1; // Collections.copy(dest, src) has 2 arguments, we need src
                 if ("copy".equals(methodName) && "java/util/Collections".equals(getClassConstantOperand())
-                        && stackDepth > stackItemForCopy) { // check method before the stack
-                    XField field = stack.getStackItem(stackItemForCopy).getXField();
-                    if (mutableFields.contains(stack.getStackItem(stackItemForCopy).getXField())) {
+                        && stackDepth > STACK_ITEM_FOR_COPY) { // check method before the stack
+                    XField field = stack.getStackItem(STACK_ITEM_FOR_COPY).getXField();
+                    if (mutableFields.contains(stack.getStackItem(STACK_ITEM_FOR_COPY).getXField())) {
                         mutableFields.remove(field);
                     }
                 }
@@ -129,7 +127,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
             }
         }
     }
-    
+
     @Override
     public void report() {
         mutableFields.clear();

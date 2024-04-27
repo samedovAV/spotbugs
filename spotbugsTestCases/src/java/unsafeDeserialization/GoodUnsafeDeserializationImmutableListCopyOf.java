@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GoodUnsafeDeserializationImmutableListCopyOf implements Serializable {
 
-    private ImmutableList<Object> immutable = new ImmutableList.Builder<Object>().build();
+    private static final ImmutableList<Object> immutable = new ImmutableList.Builder<>().build();
 
     private List<Object> mutable = null;
 
