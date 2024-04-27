@@ -22,12 +22,12 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
         assertUDBug("BadUnsafeDeserialization", "mutable");
     }
-    
+
     @Test
     void testBadUnsafeDeserializationWrongOrder() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationWrongOrder.class");
         assertNumOfUDBugs(1);
-        
+
         assertUDBug("BadUnsafeDeserializationWrongOrder", "mutable");
     }
 
@@ -71,12 +71,12 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
         assertUDBug("BadUnsafeDeserializationFinalCollection", "mutable");
     }
-    
+
     @Test
     void testBadUnsafeDeserializationSeveralFields() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationSeveralFields.class");
         assertNumOfUDBugs(1);
-        
+
         assertUDBug("BadUnsafeDeserializationSeveralFields", "anotherMutable, mutable");
     }
 
@@ -103,13 +103,13 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserialization.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationNoReadObject() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationNoReadObject.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationWrongSignature() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongSignature.class");
@@ -161,31 +161,31 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/arrays/GoodUnsafeDeserializationArraycopy.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationImmutableListCopyOf() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationImmutableListCopyOf.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationClone() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationClone.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationWrongName() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongMethodName.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationSeveralFields() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationSeveralFields.class");
         assertNumOfUDBugs(0);
     }
-    
+
     @Test
     void testGoodUnsafeDeserializationGenerics() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOfGenerics.class");
