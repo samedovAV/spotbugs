@@ -8,12 +8,12 @@ import java.util.List;
 
 public class BadUnsafeDeserializationList implements Serializable {
 
-    private static final List<Object> epoch = new ArrayList<>();
+    private static final List<Object> immutable = new ArrayList<>();
 
-    private List<Object> date = null; // Mutable component
+    private List<Object> mutable = null;
 
     public BadUnsafeDeserializationList(List<Object> date) {
-        this.date = date;
+        mutable = new ArrayList<>(date);
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

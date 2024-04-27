@@ -16,11 +16,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
     @Test
-    void testBadUnsafeDeserializationOne() {
+    void testBadUnsafeDeserialization() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserialization", "date");
+        assertUDBug("BadUnsafeDeserialization", "mutable");
+    }
+    
+    @Test
+    void testBadUnsafeDeserializationWrongOrder() {
+        performAnalysis("unsafeDeserialization/BadUnsafeDeserializationWrongOrder.class");
+        assertNumOfUDBugs(1);
+        
+        assertUDBug("BadUnsafeDeserializationWrongOrder", "mutable");
     }
 
     @Test
@@ -29,7 +37,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
                 "unsafeDeserialization/BadUnsafeDeserializationInheritance.class");
         assertNumOfUDBugs(2);
 
-        assertUDBug("BadUnsafeDeserializationInheritance", "date");
+        assertUDBug("BadUnsafeDeserialization", "mutable");
     }
 
     @Test
@@ -37,7 +45,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationList.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationList", "date");
+        assertUDBug("BadUnsafeDeserializationList", "mutable");
     }
 
     @Test
@@ -45,7 +53,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationHashMap.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationHashMap", "date");
+        assertUDBug("BadUnsafeDeserializationHashMap", "mutable");
     }
 
     @Test
@@ -53,7 +61,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationArray.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationArray", "date");
+        assertUDBug("BadUnsafeDeserializationArray", "mutable");
     }
 
     @Test
@@ -61,16 +69,25 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationFinalCollection.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationFinalCollection", "date");
+        assertUDBug("BadUnsafeDeserializationFinalCollection", "mutable");
+    }
+    
+    @Test
+    void testBadUnsafeDeserializationSeveralFields() {
+        performAnalysis("unsafeDeserialization/BadUnsafeDeserializationSeveralFields.class");
+        assertNumOfUDBugs(1);
+        
+        assertUDBug("BadUnsafeDeserializationSeveralFields", "anotherMutable, mutable");
     }
 
-    /*@Test
-    void testBadUnsafeDeserializationSevenEnum() { // todo: fix case
+    /**
+     * The emum is count like an immutable already
+     */
+    @Test
+    void testBadUnsafeDeserializationEnum() {
         performAnalysis("unsafeDeserialization/enums/BadUnsafeDeserializationEnum.class");
-        assertNumOfUDBugs(1);
-    
-        assertUDBug("BadUnsafeDeserializationSevenEnum", "date");
-    }*/
+        assertNumOfUDBugs(0);
+    }
 
     @Test
     void testBadUnsafeDeserializationRecord() {
@@ -84,6 +101,18 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testGoodUnsafeDeserialization() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserialization.class");
+        assertNumOfUDBugs(0);
+    }
+    
+    @Test
+    void testGoodUnsafeDeserializationNoReadObject() {
+        performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationNoReadObject.class");
+        assertNumOfUDBugs(0);
+    }
+    
+    @Test
+    void testGoodUnsafeDeserializationWrongSignature() {
+        performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongSignature.class");
         assertNumOfUDBugs(0);
     }
 
@@ -100,15 +129,14 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         assertNumOfUDBugs(0);
     }
 
-    /*@Test
-    void testGoodUnsafeDeserializationFactoryMethod() { // todo: rework
+    @Test
+    void testGoodUnsafeDeserializationFactoryMethod() {
         performAnalysis("unsafeDeserialization/factory/GoodUnsafeDeserializationFactory.class",
-            "unsafeDeserialization/factory/FactoryInterface.class",
-            "unsafeDeserialization/factory/ClassFactory.class",
-            "unsafeDeserialization/factory/ClassFactoryItem.class",
-            "unsafeDeserialization/factory/FactoryInterfaceImplementation.class");
+                "unsafeDeserialization/factory/Car.class",
+                "unsafeDeserialization/factory/MotorVehicle.class",
+                "unsafeDeserialization/factory/CarFactory.class");
         assertNumOfUDBugs(0);
-    }*/
+    }
 
     @Test
     void testGoodUnsafeDeserializationCopyOfList() {
@@ -145,6 +173,24 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationClone.class");
         assertNumOfUDBugs(0);
     }
+    
+    @Test
+    void testGoodUnsafeDeserializationWrongName() {
+        performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongMethodName.class");
+        assertNumOfUDBugs(0);
+    }
+    
+    @Test
+    void testGoodUnsafeDeserializationSeveralFields() {
+        performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationSeveralFields.class");
+        assertNumOfUDBugs(0);
+    }
+    
+    @Test
+    void testGoodUnsafeDeserializationGenerics() {
+        performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOfGenerics.class");
+        assertNumOfUDBugs(0);
+    }
 
     private void assertNumOfUDBugs(int num) {
         final BugInstanceMatcher bugTypeMatcher = new BugInstanceMatcherBuilder()
@@ -176,24 +222,4 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
         assert false;
     }
-    
-    // change name of readObject (also parameters) as test cases -- example -- good
-    // several fields in class
-    // more complex examples
-    // generics remaining
-    // if the class of the field is immutable (e.g. final class) --> problem solved
-    // if the class of the field is mutable --> check if it is a collection
-    // Transient annotation is exception
-    
-    // types of mutable -- StringBuilder(to do), StringBuffer(to do), Date(to do), Calendar(to do),
-    // SimpleDateFormat(to do), BigInteger(to do), BigDecimal(to do), AtomicReference(to do), AtomicBoolean(to do),
-    // AtomicInteger(to do), AtomicLong(to do), AtomicReferenceArray(to do), AtomicLongArray(to do),
-    // AtomicReferenceFieldUpdater(to do), AtomicIntegerFieldUpdater(to do), AtomicLongFieldUpdater(to do),
-    // AtomicMarkableReference(to do), AtomicStampedReference(to do), CopyOnWriteArrayList(to do),
-    // CopyOnWriteArraySet(to do), ConcurrentHashMap(to do), ConcurrentSkipListMap(to do),
-    // ConcurrentSkipListSet(to do), ConcurrentLinkedQueue(to do), ConcurrentLinkedDeque(to do),
-    // ConcurrentLinkedHashMap(to do)
-    /* Map.copyOf(); */
-    // Generics: 'unsafeDeserialization.GoodUnsafeDeserializationSetCopyOf.this' cannot be referenced from a static context
-    
 }

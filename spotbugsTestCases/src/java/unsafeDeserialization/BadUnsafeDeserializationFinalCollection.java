@@ -8,13 +8,13 @@ import java.util.Set;
 
 public class BadUnsafeDeserializationFinalCollection implements Serializable {
 
-    private static final Set<Object> epoch = new HashSet<>();
+    private static final Set<Object> immutable = new HashSet<>();
     // mutable itself (unmodifiableSet is for true immutability)
 
-    private Set<Object> date = null; // Mutable component
+    private Set<Object> mutable = null;
 
     public BadUnsafeDeserializationFinalCollection(Set<Object> set) {
-        date = new HashSet<>(set);
+        mutable = new HashSet<>(set);
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
