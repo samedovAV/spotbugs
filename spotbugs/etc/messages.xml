@@ -1858,7 +1858,7 @@ factory pattern to create these objects.</p>
   <Detector class="edu.umd.cs.findbugs.detect.UnsafeDeserialization">
     <Details>
       <![CDATA[
-            <p>Checks for defensive copies of mutable fields in class which perform deserializaion.
+            <p>Checks for missing defensive copies of mutable fields in class which perform deserialization.
             </p>
       ]]>
     </Details>
@@ -9343,19 +9343,17 @@ Using floating-point variables should not be used as loop counters, as they are 
   </BugPattern>
   <BugPattern type="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES">
     <ShortDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.</ShortDescription>
-    <LongDescription>Every serializable class that has private mutable instance variables must defensively copy them in the '{3}' method.</LongDescription>
+    <LongDescription>The following mutable fields {2} in {1} class must be defensively copied in {3} method.</LongDescription>
     <Details>
       <![CDATA[
-        <p>There is no need to copy immutable subobjects.
-        Also, avoid using the subobject's clone() method because it can be overridden when the subobject's class is not final and produces only a shallow copy.
-        The references to the subobjects themselves must be nonfinal so that defensive copying can occur.
-        It is also inadvisable to use the writeUnshared() and readUnshared() methods as an alternative</p>
-
-        <p>
-        See SEI CERT rule <a href="https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization">SER06-J. Make defensive copies of private mutable components during deserialization</a>
-        for more information.
-        </p>
-        ]]>
+    <p>There is no need to copy immutable subobjects.
+    Also, avoid using the subobject's clone() method because it can be overridden when the subobject's class is not final and produces only a shallow copy.
+    The references to the subobjects themselves must be nonfinal so that defensive copying can occur.
+    It is also inadvisable to use the writeUnshared() and readUnshared() methods as an alternative.</p>
+    <p>To fix this issue, ensure that your class does not rely on mutable private instance variables, or if it does, that it defensively copies them in the readObject() method. This is crucial in maintaining data integrity during the deserialization process.</p>
+    <p>For example, if your class has a private mutable field of type List, instead of directly returning the list in your getter method, return a new ArrayList constructed with your list. This way, the caller gets a copy of your list and modifications to the returned list won't affect your class's internal state.</p>
+    <p>Remember, the goal is to ensure that your class's invariants are not violated and its internal state is not unexpectedly modified. Defensive copying is a key strategy to achieve this when dealing with mutable instance variables.</p>
+  ]]>
     </Details>
   </BugPattern>
   <!--
