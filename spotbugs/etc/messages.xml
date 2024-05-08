@@ -9342,8 +9342,8 @@ Using floating-point variables should not be used as loop counters, as they are 
     </Details>
   </BugPattern>
   <BugPattern type="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES">
-    <ShortDescription>Every serializable class that has private mutable instance variables must defensively copy them in the readObject() method.</ShortDescription>
-    <LongDescription>The following mutable fields {2} in {1} class must be defensively copied in {3} method.</LongDescription>
+    <ShortDescription>Every serializable class that has private mutable instance variables must defensively copy them in its readObject() method to maintain data integrity during deserialization. Failure to implement this can lead to bugs, unpredictable behavior, and potential security vulnerabilities.</ShortDescription>
+    <LongDescription>The following mutable fields {1} in {0} class must be defensively copied in {2} method.</LongDescription>
     <Details>
       <![CDATA[
     <p>There is no need to copy immutable subobjects.
@@ -9353,6 +9353,7 @@ Using floating-point variables should not be used as loop counters, as they are 
     <p>To fix this issue, ensure that your class does not rely on mutable private instance variables, or if it does, that it defensively copies them in the readObject() method. This is crucial in maintaining data integrity during the deserialization process.</p>
     <p>For example, if your class has a private mutable field of type List, instead of directly returning the list in your getter method, return a new ArrayList constructed with your list. This way, the caller gets a copy of your list and modifications to the returned list won't affect your class's internal state.</p>
     <p>Remember, the goal is to ensure that your class's invariants are not violated and its internal state is not unexpectedly modified. Defensive copying is a key strategy to achieve this when dealing with mutable instance variables.</p>
+    <p>See SEI CERT rule <a href="https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization">SER06-J. Make defensive copies of private mutable components during deserialization</a> for more information.</p>
   ]]>
     </Details>
   </BugPattern>

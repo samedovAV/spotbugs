@@ -35,9 +35,8 @@ import java.util.stream.Collectors;
 
 public class UnsafeDeserialization extends OpcodeStackDetector {
 
-    public static final int STACK_ITEM_FOR_COPY = 1; // Collections.copy(dest, src) has 2 arguments, we need src
-    public static final int STACK_DEPTH_FOR_SYSTEM_ARRAYCOPY = 3; // Minimum stack depth for System.arraycopy()
-    public static final int STACK_ITEM_FOR_SYSTEM_ARRAYCOPY = 2; // System.arraycopy() has 3 arguments, we need the second one
+    private static final int STACK_ITEM_FOR_COPY = 1; // Collections.copy(dest, src) has 2 arguments, we need src
+    private static final int STACK_ITEM_FOR_SYSTEM_ARRAYCOPY = 2; // System.arraycopy() has 3 arguments, we need the second one
 
     private final BugReporter bugReporter;
 
@@ -47,7 +46,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
         this.bugReporter = bugReporter;
     }
 
-    private Method isReadObjectFoundAndGet(JavaClass obj) {
+    private Method getRealObjectMethodIfFound(JavaClass obj) {
         return Arrays.stream(obj.getMethods())
                 .filter(this::isReadObject)
                 .findFirst()
@@ -82,7 +81,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
 
     @Override
     public void visitAfter(JavaClass obj) {
-        Method readObjectFoundAndGet = isReadObjectFoundAndGet(obj);
+        Method readObjectFoundAndGet = getRealObjectMethodIfFound(obj);
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
             String allFields = mutableFields.stream()
                     .map(XField::getName)
@@ -107,21 +106,25 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
             } else if (seen == Const.INVOKESTATIC || seen == Const.INVOKEVIRTUAL
                     || seen == Const.INVOKESPECIAL || seen == Const.INVOKEINTERFACE) {
                 String methodName = getNameConstantOperand();
-                // Collections.copy()
                 int stackDepth = stack.getStackDepth();
-                if ("copy".equals(methodName) && "java/util/Collections".equals(getClassConstantOperand())
-                        && stackDepth > STACK_ITEM_FOR_COPY) { // check method before the stack
-                    XField field = stack.getStackItem(STACK_ITEM_FOR_COPY).getXField();
-                    mutableFields.remove(field);
+                // Collections.copy()
+                if (isCollectionsCopy(methodName, stackDepth)) { // check method before the stack
+                    mutableFields.remove(stack.getStackItem(STACK_ITEM_FOR_COPY).getXField());
                 }
                 // System.arraycopy()
-                if ("arraycopy".equals(methodName) && "java/lang/System".equals(getClassConstantOperand())
-                        && stackDepth >= STACK_DEPTH_FOR_SYSTEM_ARRAYCOPY) {
-                    XField field = stack.getStackItem(STACK_ITEM_FOR_SYSTEM_ARRAYCOPY).getXField();
-                    mutableFields.remove(field);
+                if (isSystemArrayCopy(methodName, stackDepth)) {
+                    mutableFields.remove(stack.getStackItem(STACK_ITEM_FOR_SYSTEM_ARRAYCOPY).getXField());
                 }
             }
         }
+    }
+
+    private boolean isCollectionsCopy(String methodName, int stackDepth) {
+        return "copy".equals(methodName) && "java/util/Collections".equals(getClassConstantOperand()) && stackDepth > STACK_ITEM_FOR_COPY;
+    }
+
+    private boolean isSystemArrayCopy(String methodName, int stackDepth) {
+        return "arraycopy".equals(methodName) && "java/lang/System".equals(getClassConstantOperand()) && stackDepth > STACK_ITEM_FOR_SYSTEM_ARRAYCOPY;
     }
 
     @Override
