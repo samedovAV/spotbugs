@@ -228,15 +228,4 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
         assert false;
     }
-
-    // change name of readObject (also parameters) as test cases -- example -- good
-
-    // types of mutable -- StringBuilder(to do), StringBuffer(to do), Date(to do), Calendar(to do),
-    // SimpleDateFormat(to do), BigInteger(to do), BigDecimal(to do), AtomicReference(to do), AtomicBoolean(to do),
-    // AtomicInteger(to do), AtomicLong(to do), AtomicReferenceArray(to do), AtomicLongArray(to do),
-    // AtomicReferenceFieldUpdater(to do), AtomicIntegerFieldUpdater(to do), AtomicLongFieldUpdater(to do),
-    // AtomicMarkableReference(to do), AtomicStampedReference(to do), CopyOnWriteArrayList(to do),
-    // CopyOnWriteArraySet(to do), ConcurrentHashMap(to do), ConcurrentSkipListMap(to do),
-    // ConcurrentSkipListSet(to do), ConcurrentLinkedQueue(to do), ConcurrentLinkedDeque(to do),
-    // ConcurrentLinkedHashMap(to do)
 }
