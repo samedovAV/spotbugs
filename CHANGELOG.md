@@ -48,7 +48,7 @@ Currently the versioning policy of this project follows [Semantic Versioning v2.
 
 ### Added
 - New detector `UnsafeDeserialization` and introduced new bug type:
-  - `UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES` is reported in case when defensive copy ins not made during deserialization.
+  - UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES` is reported in case when defensive copy is not made during deserialization.
   (See [SEI CERT SER06-J](https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization))
 
 ## 4.8.5 - 2024-05-03

@@ -46,7 +46,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
         this.bugReporter = bugReporter;
     }
 
-    private Method getRealObjectMethodIfFound(JavaClass obj) {
+    private Method getReadObjectMethodIfFound(JavaClass obj) {
         return Arrays.stream(obj.getMethods())
                 .filter(this::isReadObject)
                 .findFirst()
@@ -81,7 +81,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
 
     @Override
     public void visitAfter(JavaClass obj) {
-        Method readObjectFoundAndGet = getRealObjectMethodIfFound(obj);
+        Method readObjectFoundAndGet = getReadObjectMethodIfFound(obj);
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
             String allFields = mutableFields.stream()
                     .map(XField::getName)
@@ -89,8 +89,8 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
                     .collect(Collectors.joining(", "));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
                     .addClass(obj)
-                    .addString(allFields)
-                    .addMethod(obj, readObjectFoundAndGet));
+                    .addMethod(obj, readObjectFoundAndGet)
+                    .addString(allFields));
         }
     }
 
@@ -98,8 +98,10 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void sawOpcode(int seen) {
         if (isSerializable(getClassContext().getJavaClass()) && isReadObject(getMethod())) {
             // There are two ways to make a defensive copy:
-            // 1. Assignment: PUTFILED, PUTSTATIC (If the assignment is performed we suppose that the copy is done)
+            // 1. Assignment: PUTFILED, PUTSTATIC
+            // (If the assignment is performed we suppose that the defensive copy is done)
             // 2. Method call: INVOKESTATIC, INVOKEVIRTUAL, INVOKESPECIAL, INVOKEINTERFACE
+            // (A method call can be used to create a defensive copy if the method is known to return a new object that is a copy of the original)
             if (seen == Const.PUTFIELD || seen == Const.PUTSTATIC) {
                 XField field = getXFieldOperand();
                 mutableFields.remove(field);
