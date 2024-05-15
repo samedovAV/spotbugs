@@ -9,6 +9,8 @@ import edu.umd.cs.findbugs.StringAnnotation;
 import edu.umd.cs.findbugs.test.matcher.BugInstanceMatcher;
 import edu.umd.cs.findbugs.test.matcher.BugInstanceMatcherBuilder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 
 import static edu.umd.cs.findbugs.test.CountMatcher.containsExactly;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,6 +92,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testBadUnsafeDeserializationRecord() {
         performAnalysis("../java17/unsafeDeserialization/BadUnsafeDeserializationRecord.class",
                 "../java17/unsafeDeserialization/DateRecord.class");
@@ -139,24 +142,28 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfList() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOf.class");
         assertNumOfUDBugs(0);
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfSet() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationSetCopyOf.class");
         assertNumOfUDBugs(0);
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfMap() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationMapCopyOf.class");
         assertNumOfUDBugs(0);
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCollectionsCopy() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationCollectionsCopy.class");
         assertNumOfUDBugs(0);
@@ -193,6 +200,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationGenerics() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOfGenerics.class");
         assertNumOfUDBugs(0);
