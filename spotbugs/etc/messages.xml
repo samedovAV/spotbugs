@@ -9346,19 +9346,28 @@ Using floating-point variables should not be used as loop counters, as they are 
     <LongDescription>The following mutable fields {2} in {0} class must be defensively copied in {1} method.</LongDescription>
     <Details>
       <![CDATA[<p>
-        Immutable subobjects don't require copying. However, when dealing with mutable subobjects,
-        avoid using the clone() method as it can be overridden when the subobject's class isn't final, resulting in a shallow copy.
-        The references to the subobjects must be nonfinal to allow defensive copying. The use of writeUnshared() and readUnshared() methods is not recommended.
+        Immutable fields don't require copying. However, when dealing with mutable fields,
+        avoid using the clone() method as it can be overridden when the field's class isn't final, resulting in a shallow copy.
+        The references to the field must be non-final to allow defensive copying.
+        The use of writeUnshared() and readUnshared() methods is not recommended due to performance issues, compatibility concerns, increased code complexity, and potential for unexpected behavior.
       </p>
       <p>
-        To address this issue, your class should not depend on mutable private instance variables.
-        If it does, ensure that these variables are defensively copied in the readObject() method.
-        This is crucial for maintaining data integrity during deserialization.
+         When your class has mutable private variables and implements Serializable, you should create a new copy of these variables in the readObject() method.
+         This is called a defensive copy. It prevents the original object from being changed when the new object is modified.
+         This is important for maintaining the integrity of your data during deserialization.
       </p>
       <p>
-        For instance, if your class has a private mutable field of type List, don't directly return the list in your getter method.
-        Instead, return a new ArrayList constructed with your list. This ensures that the caller gets a copy of your list and any
-        modifications to the returned list won't affect your class's internal state.
+      Here's a simplified example of how you might implement this in Java:
+      <pre><code>
+      private static final List<Object> immutable = new ArrayList<>();
+      private List<Object> mutable = null; // Mutable component
+
+      private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        ObjectInputStream.GetField fields = ois.readFields();
+        List<Object> inDate = (List<Object>) fields.get("mutable", immutable);
+        mutable = List.copyOf(inDate);
+      }
+      </code></pre>
       </p>
       <p>
         The primary goal is to ensure that your class's invariants are not violated and its internal state is not unexpectedly modified.

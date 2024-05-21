@@ -30,6 +30,7 @@ import org.apache.bcel.classfile.Method;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,10 +84,9 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void visitAfter(JavaClass obj) {
         Method readObjectFoundAndGet = getReadObjectMethodIfFound(obj);
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
-            String allFields = mutableFields.stream()
+	        String allFields = String.join(", ", mutableFields.stream()
                     .map(XField::getName)
-                    .sorted()
-                    .collect(Collectors.joining(", "));
+			        .collect(Collectors.toCollection(LinkedHashSet::new)));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
                     .addClass(obj)
                     .addMethod(obj, readObjectFoundAndGet)
@@ -98,10 +98,10 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void sawOpcode(int seen) {
         if (isSerializable(getClassContext().getJavaClass()) && isReadObject(getMethod())) {
             // There are two ways to make a defensive copy:
-            // 1. Assignment: PUTFILED, PUTSTATIC
+            // 1. Assignment: PUTFIELD, PUTSTATIC
             // (If the assignment is performed we suppose that the defensive copy is done)
             // 2. Method call: INVOKESTATIC, INVOKEVIRTUAL, INVOKESPECIAL, INVOKEINTERFACE
-            // (A method call can be used to create a defensive copy if the method is known to return a new object that is a copy of the original)
+            // (A method call can be used to create a defensive copy if the method is known to create a new object that is a copy of the original)
             if (seen == Const.PUTFIELD || seen == Const.PUTSTATIC) {
                 XField field = getXFieldOperand();
                 mutableFields.remove(field);
