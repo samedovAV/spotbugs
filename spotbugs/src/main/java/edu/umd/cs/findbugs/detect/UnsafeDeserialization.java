@@ -36,9 +36,6 @@ import java.util.stream.Collectors;
 
 public class UnsafeDeserialization extends OpcodeStackDetector {
 
-    private static final int STACK_ITEM_FOR_COPY = 1; // Collections.copy(dest, src) has 2 arguments, we need src
-    private static final int STACK_ITEM_FOR_SYSTEM_ARRAYCOPY = 2; // System.arraycopy() has 3 arguments, we need the second one
-
     private final BugReporter bugReporter;
 
     private final Set<XField> mutableFields = new HashSet<>();
@@ -109,24 +106,22 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
                     || seen == Const.INVOKESPECIAL || seen == Const.INVOKEINTERFACE) {
                 String methodName = getNameConstantOperand();
                 int stackDepth = stack.getStackDepth();
+                int stackItemForCopy = 1; // Collections.copy(dest, src) has 2 arguments, we need src
+                int stackItemForSystemArraycopy = 2; // System.arraycopy() has 3 arguments, we need the second one
                 // Collections.copy()
-                if (isCollectionsCopy(methodName, stackDepth)) { // check method before the stack
-                    mutableFields.remove(stack.getStackItem(STACK_ITEM_FOR_COPY).getXField());
+                if ("copy".equals(methodName)
+                        && "java/util/Collections".equals(getClassConstantOperand())
+                        && stackDepth > stackItemForCopy) { // check method before the stack
+                    mutableFields.remove(stack.getStackItem(stackItemForCopy).getXField());
                 }
                 // System.arraycopy()
-                if (isSystemArrayCopy(methodName, stackDepth)) {
-                    mutableFields.remove(stack.getStackItem(STACK_ITEM_FOR_SYSTEM_ARRAYCOPY).getXField());
+                if ("arraycopy".equals(methodName)
+                        && "java/lang/System".equals(getClassConstantOperand())
+                        && stackDepth > stackItemForSystemArraycopy) {
+                    mutableFields.remove(stack.getStackItem(stackItemForSystemArraycopy).getXField());
                 }
             }
         }
-    }
-
-    private boolean isCollectionsCopy(String methodName, int stackDepth) {
-        return "copy".equals(methodName) && "java/util/Collections".equals(getClassConstantOperand()) && stackDepth > STACK_ITEM_FOR_COPY;
-    }
-
-    private boolean isSystemArrayCopy(String methodName, int stackDepth) {
-        return "arraycopy".equals(methodName) && "java/lang/System".equals(getClassConstantOperand()) && stackDepth > STACK_ITEM_FOR_SYSTEM_ARRAYCOPY;
     }
 
     @Override
