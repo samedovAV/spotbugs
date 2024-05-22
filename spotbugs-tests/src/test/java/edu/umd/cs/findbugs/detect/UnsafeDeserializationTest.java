@@ -16,6 +16,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
+    // todo make order in case of logic (javadoc)
+    // 1. basic
+    // 2. inheritance
+    // 3. collections
+    // 4. disabled together
+    
     @Test
     void testBadUnsafeDeserialization() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class");
@@ -224,7 +230,8 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         for (BugInstance bugInstance : bugCollection.getCollection()) {
             if (bugInstanceMatcher.matches(bugInstance)) {
                 for (BugAnnotation bugAnnotation : bugInstance.getAnnotations()) {
-                    if (bugAnnotation instanceof StringAnnotation pattern) {
+                    if (bugAnnotation instanceof StringAnnotation) {
+                        StringAnnotation pattern = (StringAnnotation) bugAnnotation;
                         if (fields.equals(pattern.getValue())) {
                             return;
                         }
