@@ -97,6 +97,15 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         assertNumOfUDBugs(0);
     }
 
+    @Test
+    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
+    void testBadUnsafeDeserializationMatsimExample() {
+        performAnalysis("../java17/unsafeDeserialization/IndexAnalysisSettings3.class");
+        //assertNumOfUDBugs(1);
+
+        //assertUDBug("BadUnsafeDeserializationRecord", "mutable");
+    }
+
     /* Good examples */
     /* Basic examples */
 
