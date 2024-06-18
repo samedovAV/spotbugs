@@ -9346,14 +9346,13 @@ Using floating-point variables should not be used as loop counters, as they are 
     <LongDescription>The following mutable fields {2} in {0} class must be defensively copied in {1} method.</LongDescription>
     <Details>
       <![CDATA[<p>
-        When the class has mutable private variables and implements Serializable, a new copy of these variables in the `readObject()` method should be created.
-        This is called a defensive copy. It prevents the original object from being changed when the new object is modified.
-        This is important for maintaining the integrity of the data during deserialization.
+        When a class has mutable private variables and implements Serializable, a new copy of these variables in the `readObject()` method should be created.
+        This is called a defensive copy (technique where a copy of a mutable object is returned or stored instead of the original to prevent unintended modifications)
+        It prevents the original object from being changed when the new object is modified. This is important for maintaining the integrity of the data during deserialization.
       </p>
       <p>
         Immutable fields don't require copying. However, when dealing with mutable fields,
         avoid using the `clone()` method as it can be overridden when the field's class isn't final, resulting in a shallow copy.
-        The references to the field must be non-final to allow defensive copying.
         The use of `writeUnshared()` and `readUnshared()` methods is not recommended due to performance issues, compatibility concerns, increased code complexity, and potential for unexpected behavior.
       </p>
       <p>
@@ -9361,7 +9360,7 @@ Using floating-point variables should not be used as loop counters, as they are 
         Defensive copying is a key strategy to achieve this when dealing with mutable instance variables.
       </p>
       <p>
-        To fix this issue, ensure that your class does not rely on mutable private instance variables, or if it does, that it defensively copies them in the `readObject()` method.
+        To fix this issue, ensure that every mutable field in the class is defensively copied in the `readObject()` method.
         This is crucial in maintaining data integrity during the deserialization process.
       </p>
     <p>See SEI CERT rule <a href="https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization">SER06-J. Make defensive copies of private mutable components during deserialization</a> for more information.</p>

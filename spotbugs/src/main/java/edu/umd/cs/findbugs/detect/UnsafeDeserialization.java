@@ -20,6 +20,7 @@ package edu.umd.cs.findbugs.detect;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugReporter;
+import edu.umd.cs.findbugs.ba.XFactory;
 import edu.umd.cs.findbugs.ba.XField;
 import edu.umd.cs.findbugs.ba.ch.Subtypes2;
 import edu.umd.cs.findbugs.bcel.OpcodeStackDetector;
@@ -64,8 +65,10 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
 
     @Override
     public void visit(Field obj) {
-        if (isSerializable(getClassContext().getJavaClass())) {
-            XField xField = getXField();
+        JavaClass javaClass = getClassContext().getJavaClass();
+        if (isSerializable(javaClass)) {
+            getXField();
+            XField xField = XFactory.createXField(javaClass, obj);
             if (MutableClasses.mutableSignature(xField.getSignature())
                     && !xField.isStatic()
                     && (xField.isPrivate() || xField.isFinal())

@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Clone is wrong, but we accept it
  */
-public class GoodUnsafeDeserializationClone implements Serializable, Cloneable {
+public class BadUnsafeDeserializationClone implements Serializable, Cloneable {
 
     private static final Date immutable = new Date(0);
 
