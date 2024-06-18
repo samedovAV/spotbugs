@@ -176,8 +176,8 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGoodUnsafeDeserializationClone() {
-        performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationClone.class");
+    void testBadUnsafeDeserializationClone() {
+        performAnalysis("unsafeDeserialization/BadUnsafeDeserializationClone.class");
         assertNumOfUDBugs(0);
     }
 
