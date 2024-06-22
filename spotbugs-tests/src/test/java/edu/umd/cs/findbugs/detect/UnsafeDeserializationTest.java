@@ -24,7 +24,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserialization", "mutable");
+        assertUDBug("BadUnsafeDeserialization", "mutable (unsafeDeserialization.BadUnsafeDeserialization)");
     }
 
     @Test
@@ -32,7 +32,8 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationSeveralFields.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationSeveralFields", "anotherMutable, mutable");
+        assertUDBug("BadUnsafeDeserializationSeveralFields",
+                "anotherMutable (unsafeDeserialization.BadUnsafeDeserializationSeveralFields), mutable (unsafeDeserialization.BadUnsafeDeserializationSeveralFields)");
     }
 
     @Test
@@ -40,7 +41,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationWrongOrder.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationWrongOrder", "mutable");
+        assertUDBug("BadUnsafeDeserializationWrongOrder", "mutable (unsafeDeserialization.BadUnsafeDeserializationWrongOrder)");
     }
 
     /* Inheritance */
@@ -51,7 +52,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
                 "unsafeDeserialization/BadUnsafeDeserializationInheritance.class");
         assertNumOfUDBugs(2);
 
-        assertUDBug("BadUnsafeDeserialization", "mutable");
+        assertUDBug("BadUnsafeDeserialization", "mutable (unsafeDeserialization.BadUnsafeDeserialization)");
     }
 
     /* Collections */
@@ -61,7 +62,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationArray.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationArray", "mutable");
+        assertUDBug("BadUnsafeDeserializationArray", "mutable (unsafeDeserialization.BadUnsafeDeserializationArray)");
     }
 
     @Test
@@ -69,7 +70,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationList.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationList", "mutable");
+        assertUDBug("BadUnsafeDeserializationList", "mutable (unsafeDeserialization.BadUnsafeDeserializationList)");
     }
 
     @Test
@@ -77,7 +78,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationHashMap.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationHashMap", "mutable");
+        assertUDBug("BadUnsafeDeserializationHashMap", "mutable (unsafeDeserialization.BadUnsafeDeserializationHashMap)");
     }
 
     @Test
@@ -85,7 +86,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationFinalCollection.class");
         assertNumOfUDBugs(1);
 
-        assertUDBug("BadUnsafeDeserializationFinalCollection", "mutable");
+        assertUDBug("BadUnsafeDeserializationFinalCollection", "mutable (unsafeDeserialization.BadUnsafeDeserializationFinalCollection)");
     }
 
     /**
@@ -95,15 +96,6 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     void testBadUnsafeDeserializationEnum() {
         performAnalysis("unsafeDeserialization/enums/BadUnsafeDeserializationEnum.class");
         assertNumOfUDBugs(0);
-    }
-
-    @Test
-    @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
-    void testBadUnsafeDeserializationMatsimExample() {
-        performAnalysis("../java17/unsafeDeserialization/IndexAnalysisSettings3.class");
-        //assertNumOfUDBugs(1);
-
-        //assertUDBug("BadUnsafeDeserializationRecord", "mutable");
     }
 
     /* Good examples */
@@ -175,6 +167,9 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
         assertNumOfUDBugs(0);
     }
 
+    /**
+     * There is a limitation with the detector because clone() creates a shallow copy, which is considered a bug
+     */
     @Test
     void testBadUnsafeDeserializationClone() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationClone.class");

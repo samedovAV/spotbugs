@@ -20,7 +20,6 @@ package edu.umd.cs.findbugs.detect;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugReporter;
-import edu.umd.cs.findbugs.ba.XFactory;
 import edu.umd.cs.findbugs.ba.XField;
 import edu.umd.cs.findbugs.ba.ch.Subtypes2;
 import edu.umd.cs.findbugs.bcel.OpcodeStackDetector;
@@ -67,8 +66,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void visit(Field obj) {
         JavaClass javaClass = getClassContext().getJavaClass();
         if (isSerializable(javaClass)) {
-            getXField();
-            XField xField = XFactory.createXField(javaClass, obj);
+            XField xField = getXField();
             if (MutableClasses.mutableSignature(xField.getSignature())
                     && !xField.isStatic()
                     && (xField.isPrivate() || xField.isFinal())
@@ -87,7 +85,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
         Method readObjectFoundAndGet = getReadObjectMethodIfFound(obj);
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
             String allFields = String.join(", ", mutableFields.stream()
-                    .map(XField::getName)
+                    .map(field -> field.getName() + " (" + field.getClassName() + ")")
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
                     .addClass(obj)

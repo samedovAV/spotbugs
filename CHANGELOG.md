@@ -39,17 +39,17 @@ Currently the versioning policy of this project follows [Semantic Versioning v2.
 ### Changed
 - Bump up Java version to 11
 
+### Added
+- New detector `UnsafeDeserialization` and introduced new bug type:
+  - `UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES` is reported in case when defensive copy is not made during deserialization for mutable fields.
+    (See [SEI CERT SER06-J](https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization))
+
 ## 4.8.6 - 2024-06-17
 ### Fixed
 - Do not report BC_UNCONFIRMED_CAST for Java 21's type switches when the switch instruction is TABLESWITCH ([#2782](https://github.com/spotbugs/spotbugs/issues/2782))
 - Do not throw exception when inspecting empty switch statements ([#2995](https://github.com/spotbugs/spotbugs/issues/2995))
 - Adjust priority since relaxed mode reports even `IGNORED_PRIORITY` ([#2994](https://github.com/spotbugs/spotbugs/issues/2994))
 - Fix duplicated log4j2 jar in distribution ([#3001](https://github.com/spotbugs/spotbugs/issues/3001))
-
-### Added
-- New detector `UnsafeDeserialization` and introduced new bug type:
-  - `UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES` is reported in case when defensive copy is not made during deserialization for mutable fields.
-  (See [SEI CERT SER06-J](https://wiki.sei.cmu.edu/confluence/display/java/SER06-J.+Make+defensive+copies+of+private+mutable+components+during+deserialization))
 
 ## 4.8.5 - 2024-05-03
 ### Fixed
