@@ -20,6 +20,7 @@ package edu.umd.cs.findbugs.detect;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugReporter;
+import edu.umd.cs.findbugs.ba.XFactory;
 import edu.umd.cs.findbugs.ba.XField;
 import edu.umd.cs.findbugs.ba.ch.Subtypes2;
 import edu.umd.cs.findbugs.bcel.OpcodeStackDetector;
@@ -63,19 +64,20 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     }
 
     @Override
-    public void visit(Field obj) {
-        JavaClass javaClass = getClassContext().getJavaClass();
-        if (isSerializable(javaClass)) {
-            XField xField = getXField();
-            if (MutableClasses.mutableSignature(xField.getSignature())
-                    && !xField.isStatic()
-                    && (xField.isPrivate() || xField.isFinal())
-                    && xField.isReferenceType()
-                    && !obj.isTransient()
-                    && !xField.isVolatile()
-                    && !xField.isSynthetic()
-                    && !xField.isEnum()) {
-                mutableFields.add(xField);
+    public void visit(JavaClass obj) {
+        if (isSerializable(obj)) {
+            for (Field fld : obj.getFields()) {
+                XField xField = XFactory.createXField(obj, fld);
+                if (MutableClasses.mutableSignature(xField.getSignature())
+                        && !xField.isStatic()
+                        && (xField.isPrivate() || xField.isFinal())
+                        && xField.isReferenceType()
+                        && !fld.isTransient()
+                        && !xField.isVolatile()
+                        && !xField.isSynthetic()
+                        && !xField.isEnum()) {
+                    mutableFields.add(xField);
+                }
             }
         }
     }
