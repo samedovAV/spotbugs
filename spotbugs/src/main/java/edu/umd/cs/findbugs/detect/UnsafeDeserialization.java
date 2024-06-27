@@ -67,16 +67,17 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void visit(JavaClass obj) {
         if (isSerializable(obj)) {
             for (Field fld : obj.getFields()) {
-                XField xField = XFactory.createXField(obj, fld);
-                if (MutableClasses.mutableSignature(xField.getSignature())
-                        && !xField.isStatic()
-                        && (xField.isPrivate() || xField.isFinal())
-                        && xField.isReferenceType()
-                        && !fld.isTransient()
-                        && !xField.isVolatile()
-                        && !xField.isSynthetic()
-                        && !xField.isEnum()) {
-                    mutableFields.add(xField);
+                if (!fld.isTransient()) {
+                    XField xField = XFactory.createXField(obj, fld);
+                    if (MutableClasses.mutableSignature(xField.getSignature())
+                            && !xField.isStatic()
+                            && (xField.isPrivate() || xField.isFinal())
+                            && xField.isReferenceType()
+                            && !xField.isVolatile()
+                            && !xField.isSynthetic()
+                            && !xField.isEnum()) {
+                        mutableFields.add(xField);
+                    }
                 }
             }
         }
@@ -94,6 +95,7 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
                     .addMethod(obj, readObjectFoundAndGet)
                     .addString(allFields));
         }
+        mutableFields.clear();
     }
 
     @Override
@@ -129,8 +131,4 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
         }
     }
 
-    @Override
-    public void report() {
-        mutableFields.clear();
-    }
 }

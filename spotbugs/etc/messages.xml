@@ -9343,7 +9343,7 @@ Using floating-point variables should not be used as loop counters, as they are 
   </BugPattern>
   <BugPattern type="UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES">
     <ShortDescription>This Serializable class has mutable fields which are not defensively copied in the `readObject()` method, but it should be.</ShortDescription>
-    <LongDescription>The following mutable fields {2} {3} in {0} class must be defensively copied in {1} method.</LongDescription>
+    <LongDescription>The following mutable fields {2} in {0} class must be defensively copied in {1} method.</LongDescription>
     <Details>
       <![CDATA[<p>
         When a class has mutable private variables and implements Serializable, a new copy of these variables in the `readObject()` method should be created.
