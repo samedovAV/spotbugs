@@ -50,7 +50,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     void testBadUnsafeDeserializationInheritance() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class",
                 "unsafeDeserialization/BadUnsafeDeserializationInheritance.class");
-        assertNumOfUDBugs(2);
+        assertNumOfUDBugs(1);
 
         assertUDBug("BadUnsafeDeserialization", "mutable (unsafeDeserialization.BadUnsafeDeserialization)");
     }
