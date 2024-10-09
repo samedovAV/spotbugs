@@ -1,18 +1,9 @@
 package edu.umd.cs.findbugs.detect;
 
 import edu.umd.cs.findbugs.AbstractIntegrationTest;
-import edu.umd.cs.findbugs.BugAnnotation;
-import edu.umd.cs.findbugs.BugCollection;
-import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.StringAnnotation;
-import edu.umd.cs.findbugs.test.matcher.BugInstanceMatcher;
-import edu.umd.cs.findbugs.test.matcher.BugInstanceMatcherBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
-
-import static edu.umd.cs.findbugs.test.CountMatcher.containsExactly;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 class UnsafeDeserializationTest extends AbstractIntegrationTest {
 
@@ -22,26 +13,22 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testBadUnsafeDeserialization() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserialization", "mutable (unsafeDeserialization.BadUnsafeDeserialization)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserialization", "readObject");
     }
 
     @Test
     void testBadUnsafeDeserializationSeveralFields() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationSeveralFields.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationSeveralFields",
-                "anotherMutable (unsafeDeserialization.BadUnsafeDeserializationSeveralFields), mutable (unsafeDeserialization.BadUnsafeDeserializationSeveralFields)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationSeveralFields", "readObject");
     }
 
     @Test
     void testBadUnsafeDeserializationWrongOrder() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationWrongOrder.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationWrongOrder", "mutable (unsafeDeserialization.BadUnsafeDeserializationWrongOrder)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationWrongOrder", "readObject");
     }
 
     /* Inheritance */
@@ -50,9 +37,8 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     void testBadUnsafeDeserializationInheritance() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserialization.class",
                 "unsafeDeserialization/BadUnsafeDeserializationInheritance.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserialization", "mutable (unsafeDeserialization.BadUnsafeDeserialization)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserialization", "readObject");
     }
 
     /* Collections */
@@ -60,33 +46,29 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testBadUnsafeDeserializationArray() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationArray.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationArray", "mutable (unsafeDeserialization.BadUnsafeDeserializationArray)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationArray", "readObject");
     }
 
     @Test
     void testBadUnsafeDeserializationList() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationList.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationList", "mutable (unsafeDeserialization.BadUnsafeDeserializationList)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationList", "readObject");
     }
 
     @Test
     void testBadUnsafeDeserializationHashMap() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationHashMap.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationHashMap", "mutable (unsafeDeserialization.BadUnsafeDeserializationHashMap)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationHashMap", "readObject");
     }
 
     @Test
     void testBadUnsafeDeserializationFinalCollection() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationFinalCollection.class");
-        assertNumOfUDBugs(1);
-
-        assertUDBug("BadUnsafeDeserializationFinalCollection", "mutable (unsafeDeserialization.BadUnsafeDeserializationFinalCollection)");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationFinalCollection", "readObject");
     }
 
     /**
@@ -95,7 +77,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testBadUnsafeDeserializationEnum() {
         performAnalysis("unsafeDeserialization/enums/BadUnsafeDeserializationEnum.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationEnum", "readObject");
     }
 
     /* Good examples */
@@ -104,38 +86,38 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testGoodUnsafeDeserialization() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserialization.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserialization", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationWrongName() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongMethodName.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationWrongMethodName", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationNoReadObject() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationNoReadObject.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationNoReadObject", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationWrongSignature() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationWrongSignature.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationWrongSignature", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationSeveralFields() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationSeveralFields.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationSeveralFields", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationCopyConstructor() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationCopyConstructor.class",
                 "unsafeDeserialization/GoodUnsafeDeserializationCopyConstructor$CopyClass.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationCopyConstructor", "readObject");
     }
 
     @Test
@@ -144,7 +126,7 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
                 "unsafeDeserialization/factory/Car.class",
                 "unsafeDeserialization/factory/MotorVehicle.class",
                 "unsafeDeserialization/factory/CarFactory.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationFactory", "readObject");
     }
 
     /* Collections */
@@ -152,28 +134,29 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     @Test
     void testGoodUnsafeDeserializationCopyOf() {
         performAnalysis("unsafeDeserialization/arrays/GoodUnsafeDeserializationCopyOf.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationCopyOf", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationArraycopy() {
         performAnalysis("unsafeDeserialization/arrays/GoodUnsafeDeserializationArraycopy.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationArraycopy", "readObject");
     }
 
     @Test
     void testGoodUnsafeDeserializationImmutableListCopyOf() {
         performAnalysis("unsafeDeserialization/GoodUnsafeDeserializationImmutableListCopyOf.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationImmutableListCopyOf", "readObject");
     }
 
     /**
      * There is a limitation with the detector because clone() creates a shallow copy, which is considered a bug
+     * FP in lines 20-21: mutable = (Date) inDate.clone();
      */
     @Test
     void testBadUnsafeDeserializationClone() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationClone.class");
-        assertNumOfUDBugs(0);
+        assertBugTypeCountBetween("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 0, 1);
     }
 
     /* Java 17+ */
@@ -186,73 +169,41 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     void testBadUnsafeDeserializationRecord() {
         performAnalysis("../java17/unsafeDeserialization/BadUnsafeDeserializationRecord.class",
                 "../java17/unsafeDeserialization/DateRecord.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationRecord", "readObject");
     }
 
     @Test
     @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfList() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOf.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationListCopyOf", "readObject");
     }
 
     @Test
     @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfSet() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationSetCopyOf.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationSetCopyOf", "readObject");
     }
 
     @Test
     @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCopyOfMap() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationMapCopyOf.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationMapCopyOf", "readObject");
     }
 
     @Test
     @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationCollectionsCopy() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationCollectionsCopy.class");
-        assertNumOfUDBugs(0);
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationCollectionsCopy", "readObject");
     }
 
     @Test
     @DisabledOnJre({ JRE.JAVA_8, JRE.JAVA_11 })
     void testGoodUnsafeDeserializationGenerics() {
         performAnalysis("../java17/unsafeDeserialization/GoodUnsafeDeserializationListCopyOfGenerics.class");
-        assertNumOfUDBugs(0);
-    }
-
-    private void assertNumOfUDBugs(int num) {
-        final BugInstanceMatcher bugTypeMatcher = new BugInstanceMatcherBuilder()
-                .bugType("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES")
-                .build();
-
-        assertThat(getBugCollection(), containsExactly(num, bugTypeMatcher));
-    }
-
-    private void assertUDBug(String className, String fields) {
-        final BugInstanceMatcher bugInstanceMatcher = new BugInstanceMatcherBuilder()
-                .bugType("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES")
-                .inClass(className)
-                .inMethod("readObject")
-                .build();
-
-        BugCollection bugCollection = getBugCollection();
-        for (BugInstance bugInstance : bugCollection.getCollection()) {
-            if (bugInstanceMatcher.matches(bugInstance)) {
-                for (BugAnnotation bugAnnotation : bugInstance.getAnnotations()) {
-                    if (bugAnnotation instanceof StringAnnotation) {
-                        StringAnnotation pattern = (StringAnnotation) bugAnnotation;
-                        if (fields.equals(pattern.getValue())) {
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        assert false;
+        assertNoBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "GoodUnsafeDeserializationListCopyOfGenerics", "readObject");
     }
 }

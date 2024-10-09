@@ -3,12 +3,13 @@ package unsafeDeserialization;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BadUnsafeDeserializationHashMap implements Serializable {
 
-    private static final Map<Object, Object> immutable = new HashMap<>();
+    private static final Map<Object, Object> immutable = Collections.unmodifiableMap(new HashMap<>());
 
     private Map<Object, Object> mutable; // Mutable component
 

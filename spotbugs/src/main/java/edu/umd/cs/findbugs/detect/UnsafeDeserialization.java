@@ -87,9 +87,9 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     public void visitAfter(JavaClass obj) {
         Method readObjectFoundAndGet = getReadObjectMethodIfFound(obj);
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
-            String allFields = String.join(", ", mutableFields.stream()
+            String allFields = mutableFields.stream()
                     .map(field -> field.getName() + " (" + field.getClassName() + ")")
-                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+                    .collect(Collectors.joining(", "));
             bugReporter.reportBug(new BugInstance("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", NORMAL_PRIORITY)
                     .addClass(obj)
                     .addMethod(obj, readObjectFoundAndGet)

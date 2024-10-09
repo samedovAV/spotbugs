@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GoodUnsafeDeserializationCollectionsCopy implements Serializable {
 
-    private static final List<String> epoch = new ArrayList<>();
+    private static final List<String> epoch = Collections.unmodifiableList(new ArrayList<>());
 
     private List<String> date = null; // Mutable component
 
