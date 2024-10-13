@@ -6,7 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Clone is wrong, but we accept it
+ * There is a limitation with the detector
+ * Clone is wrong as it creates a shallow copy, but we accept it
  */
 public class BadUnsafeDeserializationClone implements Serializable, Cloneable {
 

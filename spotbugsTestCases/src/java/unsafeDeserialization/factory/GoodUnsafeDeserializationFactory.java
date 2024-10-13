@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class GoodUnsafeDeserializationFactory implements Serializable {
 	
-	private static final MotorVehicle immutable = new Car();
+	private static final MotorVehicle immutable = new MotorVehicle("Default", "Vehicle");
 	
 	private MotorVehicle mutable = null;
 	
@@ -15,7 +15,7 @@ public class GoodUnsafeDeserializationFactory implements Serializable {
 	
 	private void readObject(ObjectInputStream ois) throws java.io.IOException, ClassNotFoundException {
 		ObjectInputStream.GetField fields = ois.readFields();
-		MotorVehicle inDate = (MotorVehicle) fields.get("mutable", immutable);
-		mutable = CarFactory.newInstance(inDate);
+		MotorVehicle inVehicle = (MotorVehicle) fields.get("mutable", immutable);
+		mutable = CarFactory.newInstance(inVehicle);
 	}
 }

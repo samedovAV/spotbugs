@@ -7,11 +7,11 @@ import java.util.Date;
 
 public class BadUnsafeDeserializationSevenEnum implements Serializable {
 
-    private static final BadUnsafeDeserializationEnum anImmutableEnum = null;
+    private static final GoodUnsafeDeserializationEnum anImmutableEnum = null;
     
-    private BadUnsafeDeserializationEnum mutable = null; // Mutable component
+    private GoodUnsafeDeserializationEnum mutable = null; // Mutable component
 
-    public BadUnsafeDeserializationSevenEnum(BadUnsafeDeserializationEnum anEnum) {
+    public BadUnsafeDeserializationSevenEnum(GoodUnsafeDeserializationEnum anEnum) {
         mutable = anEnum;
     }
 

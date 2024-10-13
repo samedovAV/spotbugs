@@ -1,16 +1,26 @@
 package unsafeDeserialization.factory;
 
-public class Car implements MotorVehicle {
+public class Car extends MotorVehicle {
 	
-	public Car() {
+	private int year;
+	
+	public Car(String make, String model, int year) {
+		super(make, model);
+		this.year = year;
 	}
 	
-	public Car(MotorVehicle vehicle) {
-		// Factory method
+	// Copy constructor for deep copying
+	public Car(Car other) {
+		super(other);
+		this.year = other.year;
+	}
+	
+	public int getYear() {
+		return year;
 	}
 	
 	@Override
-	public void build() {
-		System.out.println("Building a car");
+	public String toString() {
+		return super.toString() + " " + year;
 	}
 }

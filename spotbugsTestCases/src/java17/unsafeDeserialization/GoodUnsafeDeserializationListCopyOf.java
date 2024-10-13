@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GoodUnsafeDeserializationListCopyOf implements Serializable {
 
-    private static final List<Object> immutable = Collections.unmodifiableList(new ArrayList<>());
+    private static final List<Object> immutable = Collections.unmodifiableList(new ArrayList<>()); // emptyList() is also an option and List.of() for Java 9+
 
     private List<Object> mutable = null; // Mutable component
 
