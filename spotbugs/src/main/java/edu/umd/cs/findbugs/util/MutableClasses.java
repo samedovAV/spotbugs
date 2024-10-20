@@ -76,6 +76,15 @@ public class MutableClasses {
             "set", "put", "add", "insert", "delete", "remove", "erase", "clear", "push", "pop",
             "enqueue", "dequeue", "write", "append", "replace");
 
+    private static final Set<String> COLLECTION_SUPERCLASSES = new HashSet<>(Arrays.asList("java/util/Collection",
+            "java/util/List", "java/util/Set", "java/util/Map", "java/util/AbstractList", "java/util/SortedSet",
+            "java/util/SortedMap", "java/util/NavigableMap", "java/util/Dictionary"));
+
+    private static final Set<String> MUTABLE_COLLECTION_CLASSES = new HashSet<>(Arrays.asList("java/util/ArrayList",
+            "java/util/HashSet", "java/util/HashMap", "java/util/Hashtable", "java/util/IdentityHashMap",
+            "java/util/LinkedHashSet", "java/util/LinkedList", "java/util/LinkedHashMap", "java/util/TreeSet",
+            "java/util/TreeMap", "java/util/Properties"));
+
     public static boolean mutableSignature(String sig) {
         if (sig.charAt(0) == '[') {
             return true;
@@ -155,6 +164,21 @@ public class MutableClasses {
      */
     public static boolean looksLikeASetter(String methodName) {
         return SETTER_LIKE_PREFIXES.stream().anyMatch(methodName::startsWith);
+    }
+
+    /**
+     * Check if the field is a collection
+     *
+     * @param signature
+     *            the field signature
+     * @return true if the field is a collection
+     */
+    public static boolean isCollection(String signature) {
+        if (signature.startsWith("L") && signature.endsWith(";")) {
+            String fieldClass = signature.substring(1, signature.length() - 1);
+            return COLLECTION_SUPERCLASSES.contains(fieldClass) || MUTABLE_COLLECTION_CLASSES.contains(fieldClass);
+        }
+        return false;
     }
 
     /**

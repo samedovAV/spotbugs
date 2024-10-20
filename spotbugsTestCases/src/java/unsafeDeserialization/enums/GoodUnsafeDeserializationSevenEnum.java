@@ -3,16 +3,15 @@ package unsafeDeserialization.enums;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Date;
 
-public class BadUnsafeDeserializationSevenEnum implements Serializable {
+public class GoodUnsafeDeserializationSevenEnum implements Serializable {
 
     private static final GoodUnsafeDeserializationEnum anImmutableEnum = null;
     
-    private GoodUnsafeDeserializationEnum mutable = null; // Mutable component
+    private GoodUnsafeDeserializationEnum alsoImmutable = null; // also immutable
 
-    public BadUnsafeDeserializationSevenEnum(GoodUnsafeDeserializationEnum anEnum) {
-        mutable = anEnum;
+    public GoodUnsafeDeserializationSevenEnum(GoodUnsafeDeserializationEnum anEnum) {
+        alsoImmutable = anEnum;
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {

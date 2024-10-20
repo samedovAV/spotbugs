@@ -46,10 +46,9 @@ import edu.umd.cs.findbugs.classfile.ClassDescriptor;
 import edu.umd.cs.findbugs.classfile.Global;
 import edu.umd.cs.findbugs.util.MutableClasses;
 
+import static edu.umd.cs.findbugs.util.MutableClasses.isCollection;
+
 public class MutableStaticFields extends BytecodeScanningDetector {
-    private static final Set<String> COLLECTION_SUPERCLASSES = new HashSet<>(Arrays.asList("java/util/Collection",
-            "java/util/List", "java/util/Set", "java/util/Map", "java/util/AbstractList", "java/util/SortedSet",
-            "java/util/SortedMap", "java/util/NavigableMap", "java/util/Dictionary"));
 
     private static final Set<String> MUTABLE_COLLECTION_CLASSES = new HashSet<>(Arrays.asList("java/util/ArrayList",
             "java/util/HashSet", "java/util/HashMap", "java/util/Hashtable", "java/util/IdentityHashMap",
@@ -271,14 +270,6 @@ public class MutableStaticFields extends BytecodeScanningDetector {
         zeroOnTOS = false;
         emptyArrayOnTOS = false;
         mutableCollectionJustCreated = false;
-    }
-
-    private boolean isCollection(String signature) {
-        if (signature.startsWith("L") && signature.endsWith(";")) {
-            String fieldClass = signature.substring(1, signature.length() - 1);
-            return COLLECTION_SUPERCLASSES.contains(fieldClass) || MUTABLE_COLLECTION_CLASSES.contains(fieldClass);
-        }
-        return false;
     }
 
     private boolean interesting(XField f) {

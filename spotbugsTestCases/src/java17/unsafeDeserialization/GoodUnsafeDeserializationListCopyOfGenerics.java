@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GoodUnsafeDeserializationListCopyOfGenerics<T extends String> implements Serializable {
     
-    private static final List<String> immutable = new ArrayList<>();
+    private static final List<String> immutable = Collections.unmodifiableList(new ArrayList<>());
 
     private List<T> mutable = null; // Mutable component
 

@@ -34,6 +34,15 @@ class UnsafeDeserializationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void testBadUnsafeDeserializationSeveralFieldsOneCopied() {
+        performAnalysis("unsafeDeserialization/BadUnsafeDeserializationSeveralFieldsOneCopied.class");
+        assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);
+        assertBugInMethod("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", "BadUnsafeDeserializationSeveralFieldsOneCopied", "readObject");
+        assertUDBug("BadUnsafeDeserializationSeveralFieldsOneCopied",
+                "anotherMutable (unsafeDeserialization.BadUnsafeDeserializationSeveralFieldsOneCopied)");
+    }
+
+    @Test
     void testBadUnsafeDeserializationWrongOrder() {
         performAnalysis("unsafeDeserialization/BadUnsafeDeserializationWrongOrder.class");
         assertBugTypeCount("UD_UNSAFE_DESERIALIZATION_DEFENSIVE_COPIES", 1);

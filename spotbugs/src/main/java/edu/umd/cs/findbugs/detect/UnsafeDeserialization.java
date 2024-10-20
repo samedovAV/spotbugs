@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.BugReporter;
 import edu.umd.cs.findbugs.ba.XFactory;
 import edu.umd.cs.findbugs.ba.XField;
 import edu.umd.cs.findbugs.ba.ch.Subtypes2;
+import edu.umd.cs.findbugs.ba.type.TypeFrameModelingVisitor;
 import edu.umd.cs.findbugs.bcel.OpcodeStackDetector;
 import edu.umd.cs.findbugs.util.MutableClasses;
 import org.apache.bcel.Const;
@@ -32,6 +33,7 @@ import org.apache.bcel.classfile.Method;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,13 +70,17 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
             for (Field fld : obj.getFields()) {
                 if (!fld.isTransient()) {
                     XField xField = XFactory.createXField(obj, fld);
-                    if (MutableClasses.mutableSignature(xField.getSignature())
-                            && !xField.isStatic()
-                            && (xField.isPrivate() || xField.isFinal())
-                            && xField.isReferenceType()
-                            && !xField.isVolatile()
-                            && !xField.isSynthetic()
-                            && !xField.isEnum()) {
+                    // we add every collection to the mutableFields
+                    // the check the rest if it is mutable or not
+                    // in visitAfter when we checked the defensive copies
+                    if (MutableClasses.isCollection(xField.getSignature())
+                            || (MutableClasses.mutableSignature(xField.getSignature())
+                                    && !xField.isStatic()
+                                    && (xField.isPrivate() || xField.isFinal())
+                                    && xField.isReferenceType()
+                                    && !xField.isVolatile()
+                                    && !xField.isSynthetic()
+                                    && !xField.isEnum())) {
                         mutableFields.add(xField);
                     }
                 }
@@ -85,6 +91,14 @@ public class UnsafeDeserialization extends OpcodeStackDetector {
     @Override
     public void visitAfter(JavaClass obj) {
         Method readObjectFoundAndGet = getReadObjectMethodIfFound(obj);
+        Iterator<XField> iterator = mutableFields.iterator();
+        while (iterator.hasNext()) {
+            XField xField = iterator.next();
+            boolean isImmutableCollection = !MutableClasses.mutableSignature(TypeFrameModelingVisitor.getType(xField).getSignature());
+            if (isImmutableCollection) {
+                iterator.remove();
+            }
+        }
         if (!mutableFields.isEmpty() && readObjectFoundAndGet != null) {
             String allFields = mutableFields.stream()
                     .map(field -> field.getName() + " (" + field.getClassName() + ")")
